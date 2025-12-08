@@ -1,6 +1,6 @@
 'use client';
 
-import { Line, LineChart, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { Line, LineChart, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { ChartDataPoint } from '@/lib/types';
 import { format } from 'date-fns';

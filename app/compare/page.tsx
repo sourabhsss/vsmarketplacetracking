@@ -5,8 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ComparisonChart } from '@/components/comparison-chart';
 import { ArrowLeft, GitCompare } from 'lucide-react';
+import Image from 'next/image';
 import { Extension } from '@/lib/types';
 
 export default function ComparePage() {
@@ -21,8 +21,6 @@ export default function ComparePage() {
       return res.json();
     },
   });
-
-  const colors = ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444'];
 
   const toggleExtension = (id: string) => {
     setSelectedExtensions((prev) =>
@@ -83,9 +81,11 @@ export default function ComparePage() {
                   >
                     <div className="flex items-center gap-3">
                       {ext.iconUrl ? (
-                        <img
+                        <Image
                           src={ext.iconUrl}
                           alt={ext.displayName}
+                          width={40}
+                          height={40}
                           className="w-10 h-10 rounded-md"
                         />
                       ) : (

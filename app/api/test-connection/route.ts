@@ -16,7 +16,7 @@ export async function GET() {
     }
 
     // Test 2: Try to query the extensions table
-    const { data, error, count } = await supabase
+    const { error, count } = await supabase
       .from('extensions')
       .select('*', { count: 'exact', head: true });
 
@@ -49,13 +49,13 @@ export async function GET() {
       }
     });
 
-  } catch (error: any) {
+  } catch (error) {
     return NextResponse.json({
       success: false,
       error: 'Unexpected error',
       details: {
-        message: error.message,
-        stack: error.stack,
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
       }
     }, { status: 500 });
   }

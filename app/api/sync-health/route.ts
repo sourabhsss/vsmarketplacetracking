@@ -77,10 +77,10 @@ export async function GET() {
       },
       recentLogs: syncLogs?.slice(0, 10) || [],
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fetching sync health:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch sync health', details: error.message },
+      { error: 'Failed to fetch sync health', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

@@ -68,19 +68,19 @@ export async function GET(request: NextRequest) {
 
         // Extract all statistics
         const installStat = extensionData.statistics?.find(
-          (stat: any) => stat.statisticName === 'install'
+          (stat: { statisticName: string; value: string }) => stat.statisticName === 'install'
         );
         
         const averageRatingStat = extensionData.statistics?.find(
-          (stat: any) => stat.statisticName === 'averagerating'
+          (stat: { statisticName: string; value: string }) => stat.statisticName === 'averagerating'
         );
         
         const ratingCountStat = extensionData.statistics?.find(
-          (stat: any) => stat.statisticName === 'ratingcount'
+          (stat: { statisticName: string; value: string }) => stat.statisticName === 'ratingcount'
         );
         
         const downloadStat = extensionData.statistics?.find(
-          (stat: any) => stat.statisticName === 'onpremDownloads'
+          (stat: { statisticName: string; value: string }) => stat.statisticName === 'onpremDownloads'
         );
 
         // Update extension with latest metrics
@@ -131,8 +131,8 @@ export async function GET(request: NextRequest) {
         // Add delay to avoid rate limiting (200ms between requests)
         await new Promise(resolve => setTimeout(resolve, 200));
 
-      } catch (error: any) {
-        const errorMsg = `Error syncing ${extension.extension_id}: ${error.message}`;
+      } catch (error) {
+        const errorMsg = `Error syncing ${extension.extension_id}: ${error instanceof Error ? error.message : 'Unknown error'}`;
         console.error(errorMsg);
         errors.push(errorMsg);
         errorCount++;
@@ -182,7 +182,7 @@ export async function GET(request: NextRequest) {
       timestamp,
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Stats sync failed:', error);
     
     // Log failed sync
@@ -192,7 +192,7 @@ export async function GET(request: NextRequest) {
         total_extensions: 0,
         success_count: 0,
         failed_count: 0,
-        errors: JSON.stringify([error.message]),
+        errors: JSON.stringify([error instanceof Error ? error.message : 'Unknown error']),
         duration: Date.now() - startTime,
         triggered_by: triggeredBy,
         started_at: new Date(startTime).toISOString(),
@@ -205,7 +205,7 @@ export async function GET(request: NextRequest) {
       {
         success: false,
         error: 'Stats sync failed',
-        details: error.message,
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

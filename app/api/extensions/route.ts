@@ -11,7 +11,7 @@ export async function GET() {
     if (error) throw error;
 
     // Transform snake_case to camelCase
-    const transformedData = data?.map((ext: any) => ({
+    const transformedData = data?.map((ext) => ({
       id: ext.id,
       extensionId: ext.extension_id,
       publisherName: ext.publisher_name,
@@ -63,7 +63,21 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    const marketplaceData = await marketplaceResponse.json();
+    const marketplaceData = await marketplaceResponse.json() as {
+      results?: Array<{
+        extensions?: Array<{
+          publisher: { publisherName: string };
+          extensionName: string;
+          displayName: string;
+          versions?: Array<{ 
+            version: string;
+            files?: Array<{ assetType: string; source: string }>;
+          }>;
+          statistics?: Array<{ statisticName: string; value: string }>;
+          lastUpdated: string;
+        }>;
+      }>;
+    };
     const extension = marketplaceData.results?.[0]?.extensions?.[0];
 
     if (!extension) {
@@ -75,19 +89,19 @@ export async function POST(request: NextRequest) {
 
     // Extract statistics
     const installStat = extension.statistics?.find(
-      (stat: any) => stat.statisticName === 'install'
+      (stat) => stat.statisticName === 'install'
     );
     
     const downloadStat = extension.statistics?.find(
-      (stat: any) => stat.statisticName === 'onpremDownloads'
+      (stat) => stat.statisticName === 'onpremDownloads'
     );
     
     const averageRatingStat = extension.statistics?.find(
-      (stat: any) => stat.statisticName === 'averagerating'
+      (stat) => stat.statisticName === 'averagerating'
     );
     
     const ratingCountStat = extension.statistics?.find(
-      (stat: any) => stat.statisticName === 'ratingcount'
+      (stat) => stat.statisticName === 'ratingcount'
     );
 
     const newExtension = {
@@ -97,7 +111,7 @@ export async function POST(request: NextRequest) {
       display_name: extension.displayName,
       marketplace_url: `https://marketplace.visualstudio.com/items?itemName=${extensionId}`,
       icon_url: extension.versions?.[0]?.files?.find(
-        (f: any) => f.assetType === 'Microsoft.VisualStudio.Services.Icons.Default'
+        (f) => f.assetType === 'Microsoft.VisualStudio.Services.Icons.Default'
       )?.source,
       average_rating: averageRatingStat ? parseFloat(averageRatingStat.value).toFixed(2) : null,
       rating_count: ratingCountStat ? parseInt(ratingCountStat.value) : null,

@@ -1,14 +1,14 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, TrendingDown, ExternalLink, Trash2, Package, Star } from 'lucide-react';
+import { ExternalLink, Trash2, Package, Star } from 'lucide-react';
 import { ExtensionWithStats } from '@/lib/types';
 import { TrendIndicator } from '@/components/trend-indicator';
 import { AnimatedStat } from '@/components/animated-stat';
 import { CometCard } from '@/components/ui/comet-card';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface ExtensionCardProps {
   extension: ExtensionWithStats;
@@ -17,7 +17,6 @@ interface ExtensionCardProps {
 
 export function ExtensionCard({ extension, onDelete }: ExtensionCardProps) {
   const trend = extension.trend || 0;
-  const isPositive = trend >= 0;
   
   // Safety check for undefined values
   const displayName = extension.displayName || 'Unknown Extension';
@@ -33,13 +32,16 @@ export function ExtensionCard({ extension, onDelete }: ExtensionCardProps) {
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2 relative z-10">
         <div className="flex items-start gap-3 flex-1 min-w-0">
           {extension.iconUrl ? (
-            <img
+            <Image
               src={extension.iconUrl}
               alt={extension.displayName}
+              width={48}
+              height={48}
               className="w-12 h-12 rounded-md flex-shrink-0 object-cover"
               onError={(e) => {
                 e.currentTarget.style.display = 'none';
-                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                const nextSibling = e.currentTarget.nextElementSibling;
+                if (nextSibling) nextSibling.classList.remove('hidden');
               }}
             />
           ) : null}

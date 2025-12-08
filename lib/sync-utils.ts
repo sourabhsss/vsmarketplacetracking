@@ -109,6 +109,7 @@ export function shouldSync(lastSyncTime: string | null): boolean {
  * Validate that today's data exists for an extension
  */
 export async function validateDailyData(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
   extensionId: string
 ): Promise<boolean> {
@@ -133,6 +134,7 @@ export async function validateDailyData(
 /**
  * Detect and log data gaps
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function detectDataGaps(supabase: any): Promise<void> {
   try {
     // Call the Supabase function to detect gaps
@@ -145,7 +147,7 @@ export async function detectDataGaps(supabase: any): Promise<void> {
 
     if (gaps && gaps.length > 0) {
       // Insert detected gaps into data_gaps table
-      const gapRecords = gaps.map((gap: any) => ({
+      const gapRecords = gaps.map((gap: { extension_id: string; gap_date: string }) => ({
         extension_id: gap.extension_id,
         gap_date: gap.gap_date,
         detected: true,

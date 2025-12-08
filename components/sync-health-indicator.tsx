@@ -39,7 +39,7 @@ interface SyncHealth {
   };
   gaps: {
     total: number;
-    recent: any[];
+    recent: Array<Record<string, unknown>>;
   };
 }
 

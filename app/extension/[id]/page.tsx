@@ -1,11 +1,12 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatsChart } from '@/components/stats-chart';
+import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatedStat } from '@/components/animated-stat';
 import { TrendIndicator } from '@/components/trend-indicator';
@@ -28,7 +29,6 @@ import {
 export default function ExtensionDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [timeRange, setTimeRange] = useState<TimeRange>('week');
 
   const { data: extension, isLoading: extensionLoading } = useQuery({
@@ -37,7 +37,7 @@ export default function ExtensionDetailPage() {
       const res = await fetch('/api/extensions');
       if (!res.ok) throw new Error('Failed to fetch extension');
       const data = await res.json();
-      return data.find((ext: any) => ext.id === params.id);
+      return data.find((ext: { id: string }) => ext.id === params.id);
     },
   });
 
@@ -69,7 +69,7 @@ export default function ExtensionDetailPage() {
   });
 
   const chartData =
-    stats?.map((stat: any) => ({
+    stats?.map((stat: { recorded_at: string; install_count: string | number }) => ({
       date: stat.recorded_at,
       installs: Number(stat.install_count),
     })) || [];
@@ -123,9 +123,11 @@ export default function ExtensionDetailPage() {
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-4">
               {extension.iconUrl ? (
-                <img
+                <Image
                   src={extension.iconUrl}
                   alt={extension.displayName}
+                  width={80}
+                  height={80}
                   className="w-20 h-20 rounded-xl ring-2 ring-primary/20"
                 />
               ) : (
@@ -165,7 +167,7 @@ export default function ExtensionDetailPage() {
                   <AlertDialogHeader>
                     <AlertDialogTitle>Delete Extension</AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to delete "{extension.displayName}"? This will remove all historical data and cannot be undone.
+                      Are you sure you want to delete &quot;{extension.displayName}&quot;? This will remove all historical data and cannot be undone.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

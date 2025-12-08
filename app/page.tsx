@@ -28,7 +28,7 @@ export default function Home() {
       
       // Fetch stats for each extension
       const extensionsWithStats = await Promise.all(
-        data.map(async (ext: any) => {
+        data.map(async (ext: { id: string }) => {
           const statsRes = await fetch(`/api/stats/${ext.id}?range=week`);
           const stats = await statsRes.json();
           

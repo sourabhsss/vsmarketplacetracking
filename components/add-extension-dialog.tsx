@@ -33,7 +33,7 @@ export function AddExtensionDialog({ onAdd }: AddExtensionDialogProps) {
       setExtensionId('');
       setOpen(false);
       toast.success('Extension added successfully');
-    } catch (error) {
+    } catch {
       toast.error('Failed to add extension');
     } finally {
       setLoading(false);

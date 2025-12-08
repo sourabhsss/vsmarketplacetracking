@@ -1,17 +1,17 @@
 'use client';
 
-import { Line, LineChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Line, LineChart, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { format } from 'date-fns';
 
 interface ComparisonChartProps {
-  data: any[];
+  data: Array<Record<string, string | number>>;
   extensions: { id: string; name: string; color: string }[];
   className?: string;
 }
 
 export function ComparisonChart({ data, extensions, className }: ComparisonChartProps) {
-  const chartConfig = extensions.reduce((acc, ext, index) => {
+  const chartConfig = extensions.reduce((acc, ext) => {
     acc[ext.id] = {
       label: ext.name,
       color: ext.color,

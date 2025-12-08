@@ -1,0 +1,67 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Extension {
+  id            String   @id @default(uuid())
+  extensionId   String   @unique @map("extension_id")
+  publisherName String   @map("publisher_name")
+  extensionName String   @map("extension_name")
+  displayName   String   @map("display_name")
+  marketplaceUrl String  @map("marketplace_url")
+  iconUrl       String?  @map("icon_url")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  
+  stats         InstallStat[]
+  
+  @@map("extensions")
+}
+
+model InstallStat {
+  id           String   @id @default(uuid())
+  extensionId  String   @map("extension_id")
+  installCount BigInt   @map("install_count")
+  recordedAt   DateTime @map("recorded_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  
+  extension    Extension @relation(fields: [extensionId], references: [id], onDelete: Cascade)
+  
+  @@map("install_stats")
+  @@index([extensionId, recordedAt])
+}
+
+model SyncLog {
+  id              String   @id @default(uuid())
+  status          String   // 'success', 'partial', 'failed'
+  totalExtensions Int      @map("total_extensions")
+  successCount    Int      @map("success_count")
+  failedCount     Int      @map("failed_count")
+  errors          String?  @db.Text // JSON string of errors
+  duration        Int?     // milliseconds
+  triggeredBy     String   @default("cron") @map("triggered_by") // 'cron', 'manual', 'fallback'
+  startedAt       DateTime @map("started_at")
+  completedAt     DateTime @default(now()) @map("completed_at")
+  
+  @@map("sync_logs")
+  @@index([completedAt])
+  @@index([status])
+}
+
+model DataGap {
+  id          String   @id @default(uuid())
+  extensionId String   @map("extension_id")
+  gapDate     DateTime @map("gap_date")
+  detected    Boolean  @default(true)
+  backfilled  Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  @@map("data_gaps")
+  @@unique([extensionId, gapDate])
+  @@index([detected, backfilled])
+}

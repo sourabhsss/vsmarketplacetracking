@@ -154,67 +154,75 @@ export default function Home() {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8 grid gap-4 md:grid-cols-4">
           <div className="rounded-xl border border-border/50 glass-effect p-6 card-hover group relative overflow-hidden">
-            <BorderBeam lightColor="#6366f1" lightWidth={250} duration={10} />
-            <div className="flex items-center justify-between mb-3">
-              <Package className="h-5 w-5 text-primary" />
-              <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:glow-primary transition-all">
-                <Package className="h-4 w-4 text-primary" />
+            <BorderBeam lightColor="#6366f1" lightWidth={250} duration={10} className="absolute inset-0 pointer-events-none" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-3">
+                <Package className="h-5 w-5 text-primary" />
+                <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:glow-primary transition-all">
+                  <Package className="h-4 w-4 text-primary" />
+                </div>
               </div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">
+                Total Extensions
+              </p>
+              <p className="text-3xl font-bold gradient-text">
+                <AnimatedStat value={extensions?.length || 0} />
+              </p>
             </div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">
-              Total Extensions
-            </p>
-            <p className="text-3xl font-bold gradient-text">
-              <AnimatedStat value={extensions?.length || 0} />
-            </p>
           </div>
 
           <div className="rounded-xl border border-border/50 glass-effect p-6 card-hover group relative overflow-hidden">
-            <BorderBeam lightColor="#ec4899" lightWidth={250} duration={12} />
-            <div className="flex items-center justify-between mb-3">
-              <Activity className="h-5 w-5 text-secondary" />
-              <div className="h-8 w-8 rounded-lg bg-secondary/10 flex items-center justify-center group-hover:glow-secondary transition-all">
-                <Activity className="h-4 w-4 text-secondary" />
+            <BorderBeam lightColor="#ec4899" lightWidth={250} duration={12} className="absolute inset-0 pointer-events-none" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-3">
+                <Activity className="h-5 w-5 text-secondary" />
+                <div className="h-8 w-8 rounded-lg bg-secondary/10 flex items-center justify-center group-hover:glow-secondary transition-all">
+                  <Activity className="h-4 w-4 text-secondary" />
+                </div>
               </div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">
+                Total Installs
+              </p>
+              <p className="text-3xl font-bold gradient-text">
+                <AnimatedStat value={totalInstalls} />
+              </p>
             </div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">
-              Total Installs
-            </p>
-            <p className="text-3xl font-bold gradient-text">
-              <AnimatedStat value={totalInstalls} />
-            </p>
           </div>
 
           <div className="rounded-xl border border-border/50 glass-effect p-6 card-hover group relative overflow-hidden">
-            <BorderBeam lightColor="#f59e0b" lightWidth={250} duration={14} />
-            <div className="flex items-center justify-between mb-3">
-              <Star className="h-5 w-5 text-warning" />
-              <div className="h-8 w-8 rounded-lg bg-warning/10 flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all">
-                <Star className="h-4 w-4 text-warning" />
+            <BorderBeam lightColor="#f59e0b" lightWidth={250} duration={14} className="absolute inset-0 pointer-events-none" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-3">
+                <Star className="h-5 w-5 text-warning" />
+                <div className="h-8 w-8 rounded-lg bg-warning/10 flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all">
+                  <Star className="h-4 w-4 text-warning" />
+                </div>
               </div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">
+                Average Rating
+              </p>
+              <p className="text-3xl font-bold gradient-text">
+                <AnimatedStat value={averageRating} decimals={1} />
+              </p>
             </div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">
-              Average Rating
-            </p>
-            <p className="text-3xl font-bold gradient-text">
-              <AnimatedStat value={averageRating} decimals={1} />
-            </p>
           </div>
 
           <div className="rounded-xl border border-border/50 glass-effect p-6 card-hover group relative overflow-hidden">
-            <BorderBeam lightColor="#10b981" lightWidth={250} duration={16} />
-            <div className="flex items-center justify-between mb-3">
-              <TrendingUp className="h-5 w-5 text-success" />
-              <div className="h-8 w-8 rounded-lg bg-success/10 flex items-center justify-center group-hover:glow-success transition-all">
-                <TrendingUp className="h-4 w-4 text-success" />
+            <BorderBeam lightColor="#10b981" lightWidth={250} duration={16} className="absolute inset-0 pointer-events-none" />
+            <div className="relative z-10">
+              <div className="flex items-center justify-between mb-3">
+                <TrendingUp className="h-5 w-5 text-success" />
+                <div className="h-8 w-8 rounded-lg bg-success/10 flex items-center justify-center group-hover:glow-success transition-all">
+                  <TrendingUp className="h-4 w-4 text-success" />
+                </div>
               </div>
+              <p className="text-sm font-medium text-muted-foreground mb-1">
+                Average Growth
+              </p>
+              <p className="text-3xl font-bold gradient-text">
+                <AnimatedStat value={averageGrowth} decimals={1} suffix="%" />
+              </p>
             </div>
-            <p className="text-sm font-medium text-muted-foreground mb-1">
-              Average Growth
-            </p>
-            <p className="text-3xl font-bold gradient-text">
-              <AnimatedStat value={averageGrowth} decimals={1} suffix="%" />
-            </p>
           </div>
         </div>
 

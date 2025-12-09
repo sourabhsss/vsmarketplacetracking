@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StatsChart } from '@/components/stats-chart';
+import { Particles } from '@/components/ui/particles';
 import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatedStat } from '@/components/animated-stat';
@@ -109,8 +110,10 @@ export default function ExtensionDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border/50 glass-strong sticky top-0 z-50">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      <Particles variant="stars" className="absolute inset-0 pointer-events-none" />
+      
+      <header className="border-b border-border/50 glass-strong sticky top-0 z-50 backdrop-blur-xl">
         <div className="container mx-auto px-4 py-6">
           <Button
             variant="ghost"

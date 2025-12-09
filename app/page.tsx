@@ -12,6 +12,8 @@ import { Activity, RefreshCw, Star, TrendingUp, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { useFallbackSync } from '@/lib/use-fallback-sync';
+import { Particles } from '@/components/ui/particles';
+import { BorderBeam } from '@/components/ui/border-beam';
 
 export default function Home() {
   const queryClient = useQueryClient();
@@ -110,8 +112,11 @@ export default function Home() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-background relative">
-      <header className="border-b border-border/50 glass-strong sticky top-0 z-50">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Animated particles background */}
+      <Particles variant="default" className="absolute inset-0 pointer-events-none" />
+      
+      <header className="border-b border-border/50 glass-strong sticky top-0 z-50 backdrop-blur-xl">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -134,10 +139,11 @@ export default function Home() {
                 size="sm"
                 onClick={() => syncMutation.mutate()}
                 disabled={syncMutation.isPending}
-                className="border-border/50 hover:border-primary/50"
+                className="border-border/50 hover:border-primary/50 relative overflow-hidden group"
               >
-                <RefreshCw className={`h-4 w-4 mr-2 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
-                {syncMutation.isPending ? 'Syncing...' : 'Sync Stats'}
+                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                <RefreshCw className={`h-4 w-4 mr-2 relative z-10 ${syncMutation.isPending ? 'animate-spin' : ''}`} />
+                <span className="relative z-10">{syncMutation.isPending ? 'Syncing...' : 'Sync Stats'}</span>
               </Button>
               <AddExtensionDialog onAdd={(id) => addMutation.mutateAsync(id)} />
             </div>
@@ -147,7 +153,8 @@ export default function Home() {
 
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8 grid gap-4 md:grid-cols-4">
-          <div className="rounded-xl border border-border/50 glass-effect p-6 card-hover group">
+          <div className="rounded-xl border border-border/50 glass-effect p-6 card-hover group relative overflow-hidden">
+            <BorderBeam lightColor="#6366f1" lightWidth={250} duration={10} />
             <div className="flex items-center justify-between mb-3">
               <Package className="h-5 w-5 text-primary" />
               <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:glow-primary transition-all">
@@ -162,7 +169,8 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="rounded-xl border border-border/50 glass-effect p-6 card-hover group">
+          <div className="rounded-xl border border-border/50 glass-effect p-6 card-hover group relative overflow-hidden">
+            <BorderBeam lightColor="#ec4899" lightWidth={250} duration={12} />
             <div className="flex items-center justify-between mb-3">
               <Activity className="h-5 w-5 text-secondary" />
               <div className="h-8 w-8 rounded-lg bg-secondary/10 flex items-center justify-center group-hover:glow-secondary transition-all">
@@ -177,7 +185,8 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="rounded-xl border border-border/50 glass-effect p-6 card-hover group">
+          <div className="rounded-xl border border-border/50 glass-effect p-6 card-hover group relative overflow-hidden">
+            <BorderBeam lightColor="#f59e0b" lightWidth={250} duration={14} />
             <div className="flex items-center justify-between mb-3">
               <Star className="h-5 w-5 text-warning" />
               <div className="h-8 w-8 rounded-lg bg-warning/10 flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(245,158,11,0.3)] transition-all">
@@ -192,7 +201,8 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="rounded-xl border border-border/50 glass-effect p-6 card-hover group">
+          <div className="rounded-xl border border-border/50 glass-effect p-6 card-hover group relative overflow-hidden">
+            <BorderBeam lightColor="#10b981" lightWidth={250} duration={16} />
             <div className="flex items-center justify-between mb-3">
               <TrendingUp className="h-5 w-5 text-success" />
               <div className="h-8 w-8 rounded-lg bg-success/10 flex items-center justify-center group-hover:glow-success transition-all">

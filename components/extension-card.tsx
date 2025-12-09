@@ -7,6 +7,7 @@ import { ExtensionWithStats } from '@/lib/types';
 import { TrendIndicator } from '@/components/trend-indicator';
 import { AnimatedStat } from '@/components/animated-stat';
 import { CometCard } from '@/components/ui/comet-card';
+import { BorderBeam } from '@/components/ui/border-beam';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -28,6 +29,12 @@ export function ExtensionCard({ extension, onDelete }: ExtensionCardProps) {
   return (
     <CometCard rotateDepth={15} translateDepth={15} className="w-full h-full">
       <Card className="glass-effect border-border/50 group relative overflow-hidden h-full transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(99,102,241,0.2)]">
+        <BorderBeam 
+          lightColor="#6366f1" 
+          lightWidth={200} 
+          duration={15} 
+          className="opacity-0 group-hover:opacity-100 transition-opacity"
+        />
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2 relative z-10">
         <div className="flex items-start gap-3 flex-1 min-w-0">

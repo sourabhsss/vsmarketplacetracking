@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, GitCompare } from 'lucide-react';
+import { Particles } from '@/components/ui/particles';
+import { BorderBeam } from '@/components/ui/border-beam';
 import Image from 'next/image';
 import { Extension } from '@/lib/types';
 
@@ -33,8 +35,10 @@ export default function ComparePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border/50 glass-strong sticky top-0 z-50">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      <Particles variant="default" className="absolute inset-0 pointer-events-none" />
+      
+      <header className="border-b border-border/50 glass-strong sticky top-0 z-50 backdrop-blur-xl">
         <div className="container mx-auto px-4 py-6">
           <Button
             variant="ghost"
@@ -61,7 +65,8 @@ export default function ComparePage() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <Card className="glass-effect border-border/50 mb-8">
+        <Card className="glass-effect border-border/50 mb-8 relative overflow-hidden">
+          <BorderBeam lightColor="#6366f1" lightWidth={300} duration={12} />
           <CardHeader>
             <CardTitle>Select Extensions</CardTitle>
           </CardHeader>
@@ -108,7 +113,8 @@ export default function ComparePage() {
         </Card>
 
         {selectedExtensions.length > 0 && (
-          <Card className="glass-effect border-border/50">
+          <Card className="glass-effect border-border/50 relative overflow-hidden">
+            <BorderBeam lightColor="#ec4899" lightWidth={300} duration={14} />
             <CardHeader>
               <CardTitle>Comparison Chart</CardTitle>
             </CardHeader>

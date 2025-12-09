@@ -273,11 +273,31 @@ export default function ExtensionDetailPage() {
           onValueChange={(value) => setTimeRange(value as TimeRange)}
           className="mb-8"
         >
-          <TabsList className="glass-effect border border-border/50">
-            <TabsTrigger value="day">Last 24 Hours</TabsTrigger>
-            <TabsTrigger value="week">Last Week</TabsTrigger>
-            <TabsTrigger value="month">Last Month</TabsTrigger>
-            <TabsTrigger value="all">All Time</TabsTrigger>
+          <TabsList className="glass-effect border border-border/50 p-1">
+            <TabsTrigger 
+              value="day"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20"
+            >
+              Last 24 Hours
+            </TabsTrigger>
+            <TabsTrigger 
+              value="week"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20"
+            >
+              Last Week
+            </TabsTrigger>
+            <TabsTrigger 
+              value="month"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20"
+            >
+              Last Month
+            </TabsTrigger>
+            <TabsTrigger 
+              value="all"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-lg data-[state=active]:shadow-primary/20"
+            >
+              All Time
+            </TabsTrigger>
           </TabsList>
         </Tabs>
 

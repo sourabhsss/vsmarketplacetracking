@@ -102,22 +102,54 @@ export async function GET(request: NextRequest) {
         }
 
         if (installStat) {
-          // Insert new install stat record
-          const { error: insertError } = await supabase
+          const newInstallCount = parseInt(installStat.value);
+          
+          // Fetch the latest install count to ensure we only insert higher values
+          const { data: latestStat, error: fetchError } = await supabase
             .from('install_stats')
-            .insert([
-              {
-                extension_id: extension.id,
-                install_count: installStat.value,
-                recorded_at: new Date().toISOString(),
-              },
-            ]);
+            .select('install_count')
+            .eq('extension_id', extension.id)
+            .order('recorded_at', { ascending: false })
+            .limit(1)
+            .single();
 
-          if (insertError) {
-            errors.push(`Failed to save stats for ${extension.extension_id}: ${insertError.message}`);
-            errorCount++;
+          // Determine if we should insert the new value
+          let shouldInsert = true;
+          let skipReason = '';
+
+          if (!fetchError && latestStat) {
+            const latestInstallCount = parseInt(latestStat.install_count);
+            
+            if (newInstallCount <= latestInstallCount) {
+              shouldInsert = false;
+              skipReason = `Skipped: new value (${newInstallCount}) not higher than latest (${latestInstallCount})`;
+              console.log(`[${extension.extension_id}] ${skipReason}`);
+            }
+          }
+
+          if (shouldInsert) {
+            // Insert new install stat record only if value is higher
+            const { error: insertError } = await supabase
+              .from('install_stats')
+              .insert([
+                {
+                  extension_id: extension.id,
+                  install_count: newInstallCount,
+                  recorded_at: new Date().toISOString(),
+                },
+              ]);
+
+            if (insertError) {
+              errors.push(`Failed to save stats for ${extension.extension_id}: ${insertError.message}`);
+              errorCount++;
+            } else {
+              successCount++;
+              console.log(`[${extension.extension_id}] Inserted new install count: ${newInstallCount}`);
+            }
           } else {
+            // Count as success but note it was skipped
             successCount++;
+            console.log(`[${extension.extension_id}] ${skipReason}`);
           }
         } else {
           errors.push(`No install stats found for ${extension.extension_id}`);

@@ -63,20 +63,25 @@ export async function GET(request: NextRequest) {
         }
 
         // Extract all statistics
+        interface Statistic {
+          statisticName: string;
+          value: string;
+        }
+        
         const installStat = extensionData.statistics?.find(
-          (stat: any) => stat.statisticName === 'install'
+          (stat: Statistic) => stat.statisticName === 'install'
         );
         
         const averageRatingStat = extensionData.statistics?.find(
-          (stat: any) => stat.statisticName === 'averagerating'
+          (stat: Statistic) => stat.statisticName === 'averagerating'
         );
         
         const ratingCountStat = extensionData.statistics?.find(
-          (stat: any) => stat.statisticName === 'ratingcount'
+          (stat: Statistic) => stat.statisticName === 'ratingcount'
         );
         
         const downloadStat = extensionData.statistics?.find(
-          (stat: any) => stat.statisticName === 'onpremDownloads'
+          (stat: Statistic) => stat.statisticName === 'onpremDownloads'
         );
 
         // Update extension with latest metrics
@@ -122,8 +127,9 @@ export async function GET(request: NextRequest) {
         // Add small delay to avoid rate limiting
         await new Promise(resolve => setTimeout(resolve, 100));
 
-      } catch (error: any) {
-        errors.push(`Error syncing ${extension.extension_id}: ${error.message}`);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        errors.push(`Error syncing ${extension.extension_id}: ${errorMessage}`);
         errorCount++;
       }
     }
@@ -139,13 +145,14 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
 
-  } catch (error: any) {
+  } catch (error) {
     console.error('Stats sync failed:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
       {
         success: false,
         error: 'Stats sync failed',
-        details: error.message,
+        details: errorMessage,
       },
       { status: 500 }
     );

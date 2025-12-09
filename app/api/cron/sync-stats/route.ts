@@ -1,16 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import {
-  fetchMarketplaceData,
-  validateDailyData,
-  detectDataGaps,
-  sendSyncAlert,
-} from '@/lib/sync-utils';
 
 export async function GET(request: NextRequest) {
-  const startTime = Date.now();
-  const triggeredBy = request.headers.get('x-triggered-by') || 'cron';
-
   try {
     // Verify this is called by Vercel Cron (security check)
     const authHeader = request.headers.get('authorization');
@@ -18,7 +9,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log(`Starting automatic stats sync (triggered by: ${triggeredBy})...`);
+    console.log('Starting automatic stats sync...');
 
     // Fetch all extensions
     const { data: extensions, error: fetchError } = await supabase
@@ -28,17 +19,6 @@ export async function GET(request: NextRequest) {
     if (fetchError) throw fetchError;
 
     if (!extensions || extensions.length === 0) {
-      // Log empty sync
-      await supabase.from('sync_logs').insert({
-        status: 'success',
-        total_extensions: 0,
-        success_count: 0,
-        failed_count: 0,
-        triggered_by: triggeredBy,
-        started_at: new Date(startTime).toISOString(),
-        duration: Date.now() - startTime,
-      });
-
       return NextResponse.json({
         success: true,
         message: 'No extensions to sync',
@@ -49,38 +29,54 @@ export async function GET(request: NextRequest) {
     let successCount = 0;
     let errorCount = 0;
     const errors: string[] = [];
-    const syncedExtensions: string[] = [];
 
-    // Sync stats for each extension with retry logic
+    // Sync stats for each extension
     for (const extension of extensions) {
       try {
-        // Check if today's data already exists
-        const hasData = await validateDailyData(supabase, extension.id);
-        if (hasData) {
-          console.log(`Skipping ${extension.extension_id} - data already exists for today`);
-          successCount++;
-          syncedExtensions.push(extension.extension_id);
+        // Fetch latest stats from VS Code Marketplace
+        const marketplaceResponse = await fetch(
+          'https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json;api-version=3.0-preview.1',
+            },
+            body: JSON.stringify({
+              filters: [
+                {
+                  criteria: [{ filterType: 7, value: extension.extension_id }],
+                },
+              ],
+              flags: 914,
+            }),
+          }
+        );
+
+        const marketplaceData = await marketplaceResponse.json();
+        const extensionData = marketplaceData.results?.[0]?.extensions?.[0];
+
+        if (!extensionData) {
+          errors.push(`Extension not found: ${extension.extension_id}`);
+          errorCount++;
           continue;
         }
 
-        // Fetch latest stats from VS Code Marketplace with retry
-        const extensionData = await fetchMarketplaceData(extension.extension_id);
-
         // Extract all statistics
         const installStat = extensionData.statistics?.find(
-          (stat: { statisticName: string; value: string }) => stat.statisticName === 'install'
+          (stat: any) => stat.statisticName === 'install'
         );
         
         const averageRatingStat = extensionData.statistics?.find(
-          (stat: { statisticName: string; value: string }) => stat.statisticName === 'averagerating'
+          (stat: any) => stat.statisticName === 'averagerating'
         );
         
         const ratingCountStat = extensionData.statistics?.find(
-          (stat: { statisticName: string; value: string }) => stat.statisticName === 'ratingcount'
+          (stat: any) => stat.statisticName === 'ratingcount'
         );
         
         const downloadStat = extensionData.statistics?.find(
-          (stat: { statisticName: string; value: string }) => stat.statisticName === 'onpremDownloads'
+          (stat: any) => stat.statisticName === 'onpremDownloads'
         );
 
         // Update extension with latest metrics
@@ -123,101 +119,44 @@ export async function GET(request: NextRequest) {
           errorCount++;
         }
 
-        // Validate data before saving
-        if (installStat) {
-          syncedExtensions.push(extension.extension_id);
-        }
+        // Add small delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 100));
 
-        // Add delay to avoid rate limiting (200ms between requests)
-        await new Promise(resolve => setTimeout(resolve, 200));
-
-      } catch (error) {
-        const errorMsg = `Error syncing ${extension.extension_id}: ${error instanceof Error ? error.message : 'Unknown error'}`;
-        console.error(errorMsg);
-        errors.push(errorMsg);
+      } catch (error: any) {
+        errors.push(`Error syncing ${extension.extension_id}: ${error.message}`);
         errorCount++;
       }
     }
 
-    const duration = Date.now() - startTime;
-    const status = errorCount === 0 ? 'success' : (successCount > 0 ? 'partial' : 'failed');
-    const timestamp = new Date().toISOString();
-
-    console.log(`Stats sync completed: ${successCount} successful, ${errorCount} failed (${duration}ms)`);
-
-    // Log sync operation
-    await supabase.from('sync_logs').insert({
-      status,
-      total_extensions: extensions.length,
-      success_count: successCount,
-      failed_count: errorCount,
-      errors: errors.length > 0 ? JSON.stringify(errors) : null,
-      duration,
-      triggered_by: triggeredBy,
-      started_at: new Date(startTime).toISOString(),
-    });
-
-    // Detect data gaps after sync
-    await detectDataGaps(supabase);
-
-    // Send alert if sync failed or partially failed
-    if (status === 'failed' || (status === 'partial' && errorCount > successCount)) {
-      await sendSyncAlert(status, {
-        successCount,
-        failedCount: errorCount,
-        errors,
-        timestamp,
-      });
-    }
+    console.log(`Stats sync completed: ${successCount} successful, ${errorCount} failed`);
 
     return NextResponse.json({
-      success: status !== 'failed',
-      status,
-      message: `Stats sync ${status}`,
+      success: true,
+      message: 'Stats sync completed',
       synced: successCount,
       failed: errorCount,
-      total: extensions.length,
-      duration,
       errors: errors.length > 0 ? errors : undefined,
-      timestamp,
+      timestamp: new Date().toISOString(),
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Stats sync failed:', error);
-    
-    // Log failed sync
-    try {
-      await supabase.from('sync_logs').insert({
-        status: 'failed',
-        total_extensions: 0,
-        success_count: 0,
-        failed_count: 0,
-        errors: JSON.stringify([error instanceof Error ? error.message : 'Unknown error']),
-        duration: Date.now() - startTime,
-        triggered_by: triggeredBy,
-        started_at: new Date(startTime).toISOString(),
-      });
-    } catch (logError) {
-      console.error('Failed to log sync error:', logError);
-    }
-
     return NextResponse.json(
       {
         success: false,
         error: 'Stats sync failed',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: error.message,
       },
       { status: 500 }
     );
   }
 }
 
-// Allow manual trigger without auth in development
-export async function POST() {
-  if (process.env.NODE_ENV === 'development') {
-    const request = new NextRequest('http://localhost:3000/api/cron/sync-stats');
-    request.headers.set('authorization', `Bearer ${process.env.CRON_SECRET || 'dev'}`);
-    return GET(request);
-  }
-  return NextResponse.json({ error: 'Method not allowed' }, { status: 405 });
+// Allow manual trigger
+export async function POST(request: NextRequest) {
+  // Create a new request with authorization header for manual triggers
+  const url = new URL(request.url);
+  const newRequest = new NextRequest(url.toString());
+  newRequest.headers.set('authorization', `Bearer ${process.env.CRON_SECRET || 'dev'}`);
+  return GET(newRequest);
 }

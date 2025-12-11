@@ -3,6 +3,8 @@ import { supabase } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
+  // Check if this is a manual trigger (needs to be outside try block for catch access)
+  const isManualTrigger = request.headers.get('x-manual-trigger') === 'true';
 
   try {
     // Verify this is called by Vercel Cron (security check)
@@ -25,7 +27,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('Starting automatic stats sync...');
+    console.log(`Starting ${isManualTrigger ? 'manual' : 'automatic'} stats sync...`);
 
     // Fetch all extensions
     const { data: extensions, error: fetchError } = await supabase
@@ -197,7 +199,7 @@ export async function GET(request: NextRequest) {
           failed_count: errorCount,
           duration,
           errors: errors.length > 0 ? JSON.stringify(errors) : null,
-          triggered_by: 'cron',
+          triggered_by: isManualTrigger ? 'manual' : 'cron',
           started_at: new Date(startTime).toISOString(),
           completed_at: new Date().toISOString(),
         },
@@ -233,7 +235,7 @@ export async function GET(request: NextRequest) {
           failed_count: 1,
           duration,
           errors: JSON.stringify([errorMessage]),
-          triggered_by: 'cron',
+          triggered_by: isManualTrigger ? 'manual' : 'cron',
           started_at: new Date(startTime).toISOString(),
           completed_at: new Date().toISOString(),
         },
@@ -262,6 +264,7 @@ export async function POST(request: NextRequest) {
     headers: {
       ...Object.fromEntries(request.headers.entries()),
       'authorization': `Bearer ${process.env.CRON_SECRET || 'dev'}`,
+      'x-manual-trigger': 'true',
     },
   });
   return GET(newRequest);

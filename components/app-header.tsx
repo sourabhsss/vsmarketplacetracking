@@ -16,8 +16,15 @@ export function AppHeader() {
     mutationFn: async () => {
       const res = await fetch('/api/cron/sync-stats', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       });
-      if (!res.ok) throw new Error('Failed to sync stats');
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error('Sync failed:', errorText);
+        throw new Error('Failed to sync stats');
+      }
       return res.json();
     },
     onSuccess: (data) => {

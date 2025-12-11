@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { AnimatedStat } from '@/components/animated-stat';
 import { ExtensionWithStats } from '@/lib/types';
-import { Activity, RefreshCw, Star, TrendingUp, Package } from 'lucide-react';
+import { Activity, RefreshCw, Star, TrendingUp, Package, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { useFallbackSync } from '@/lib/use-fallback-sync';
@@ -135,6 +135,16 @@ export default function Home() {
             </div>
             <div className="flex gap-2 items-center">
               <SyncHealthIndicator />
+              <Link href="/monitoring">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="border-border/50 hover:border-primary/50"
+                >
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Monitoring
+                </Button>
+              </Link>
               <Button
                 variant="outline"
                 size="sm"

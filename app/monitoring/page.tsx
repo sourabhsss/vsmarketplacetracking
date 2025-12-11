@@ -196,7 +196,7 @@ export default function MonitoringPage() {
                   <TableRow>
                     <TableHead>Timestamp</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Trigger</TableHead>
+                    <TableHead>Sync Type</TableHead>
                     <TableHead className="text-right">Extensions</TableHead>
                     <TableHead className="text-right">Success</TableHead>
                     <TableHead className="text-right">Failed</TableHead>
@@ -219,8 +219,15 @@ export default function MonitoringPage() {
                         </TableCell>
                         <TableCell>{getStatusBadge(log.status)}</TableCell>
                         <TableCell>
-                          <Badge variant="outline" className="font-mono text-xs">
-                            {log.triggered_by}
+                          <Badge 
+                            variant="outline" 
+                            className={
+                              log.triggered_by === 'cron' 
+                                ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' 
+                                : 'bg-purple-500/10 text-purple-500 border-purple-500/20'
+                            }
+                          >
+                            {log.triggered_by === 'cron' ? '🤖 Auto' : '👤 Manual'}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">{log.total_extensions}</TableCell>

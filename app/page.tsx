@@ -91,6 +91,7 @@ export default function Home() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['extensions'] });
+      queryClient.invalidateQueries({ queryKey: ['sync-health'] });
       toast.success(`Synced ${data.synced} extension(s) successfully!`);
     },
     onError: () => {

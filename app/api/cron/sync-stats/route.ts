@@ -2,14 +2,49 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
+  const startTime = Date.now();
+  let syncLogId: string | null = null;
+
   try {
     // Verify this is called by Vercel Cron (security check)
     const authHeader = request.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    const cronSecret = process.env.CRON_SECRET;
+    
+    // Vercel automatically adds the CRON_SECRET as Bearer token
+    // Check if request has valid authorization
+    const isAuthorized = 
+      authHeader === `Bearer ${cronSecret}` ||
+      // Fallback for development/testing
+      (process.env.NODE_ENV === 'development' && !cronSecret);
+    
+    if (!isAuthorized) {
+      console.error('Unauthorized cron request', {
+        hasAuthHeader: !!authHeader,
+        hasCronSecret: !!cronSecret,
+        authMatch: authHeader === `Bearer ${cronSecret}`,
+      });
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     console.log('Starting automatic stats sync...');
+
+    // Create initial sync log entry
+    const { data: syncLog, error: logError } = await supabase
+      .from('sync_logs')
+      .insert([
+        {
+          status: 'running',
+          started_at: new Date().toISOString(),
+        },
+      ])
+      .select()
+      .single();
+
+    if (logError) {
+      console.error('Failed to create sync log:', logError);
+    } else {
+      syncLogId = syncLog.id;
+    }
 
     // Fetch all extensions
     const { data: extensions, error: fetchError } = await supabase
@@ -166,36 +201,82 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    console.log(`Stats sync completed: ${successCount} successful, ${errorCount} failed`);
+    const duration = Date.now() - startTime;
+    const syncStatus = errorCount === 0 ? 'success' : (successCount > 0 ? 'partial' : 'failed');
 
-    return NextResponse.json({
+    // Update sync log with completion status
+    if (syncLogId) {
+      await supabase
+        .from('sync_logs')
+        .update({
+          status: syncStatus,
+          success_count: successCount,
+          failed_count: errorCount,
+          duration,
+          completed_at: new Date().toISOString(),
+          error_details: errors.length > 0 ? errors : null,
+        })
+        .eq('id', syncLogId);
+    }
+
+    const result = {
       success: true,
       message: 'Stats sync completed',
       synced: successCount,
       failed: errorCount,
       errors: errors.length > 0 ? errors : undefined,
       timestamp: new Date().toISOString(),
-    });
+      duration,
+    };
+    
+    console.log('Stats sync completed:', result);
+
+    return NextResponse.json(result);
 
   } catch (error) {
     console.error('Stats sync failed:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Stats sync failed',
-        details: errorMessage,
-      },
-      { status: 500 }
-    );
+    const duration = Date.now() - startTime;
+
+    // Update sync log with error status
+    if (syncLogId) {
+      await supabase
+        .from('sync_logs')
+        .update({
+          status: 'failed',
+          success_count: 0,
+          failed_count: 1,
+          duration,
+          completed_at: new Date().toISOString(),
+          error_details: [errorMessage],
+        })
+        .eq('id', syncLogId);
+    }
+
+    const errorResult = {
+      success: false,
+      error: 'Stats sync failed',
+      details: errorMessage,
+      timestamp: new Date().toISOString(),
+      duration,
+    };
+    
+    console.error('Sync error details:', errorResult);
+    
+    return NextResponse.json(errorResult, { status: 500 });
   }
 }
 
 // Allow manual trigger
 export async function POST(request: NextRequest) {
+  console.log('Manual sync trigger received');
   // Create a new request with authorization header for manual triggers
   const url = new URL(request.url);
-  const newRequest = new NextRequest(url.toString());
-  newRequest.headers.set('authorization', `Bearer ${process.env.CRON_SECRET || 'dev'}`);
+  const newRequest = new NextRequest(url.toString(), {
+    headers: {
+      ...Object.fromEntries(request.headers.entries()),
+      'authorization': `Bearer ${process.env.CRON_SECRET || 'dev'}`,
+    },
+  });
   return GET(newRequest);
 }

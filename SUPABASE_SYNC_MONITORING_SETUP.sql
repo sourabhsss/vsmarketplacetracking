@@ -1,22 +1,19 @@
 -- Add monitoring tables for sync health and data gaps
 -- Run this in your Supabase SQL Editor
 
+-- Drop existing tables if they exist (to fix any corruption)
+DROP TABLE IF EXISTS data_gaps CASCADE;
+DROP TABLE IF EXISTS sync_logs CASCADE;
+DROP VIEW IF EXISTS sync_health CASCADE;
+DROP FUNCTION IF EXISTS detect_data_gaps();
+
 -- Create sync_logs table
-CREATE TABLE IF NOT EXISTS sync_logs (
+CREATE TABLE sync_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   status TEXT NOT NULL CHECK (status IN ('running', 'success', 'partial', 'failed')),
   total_extensions INTEGER NOT NULL DEFAULT 0,
   success_count INTEGER NOT NULL,
-  failed_count INTEGER NOT NU-- Allow 'running' status and make total_extensions have a default
-ALTER TABLE sync_logs 
-  DROP CONSTRAINT IF EXISTS sync_logs_status_check;
-
-ALTER TABLE sync_logs 
-  ADD CONSTRAINT sync_logs_status_check 
-  CHECK (status IN ('running', 'success', 'partial', 'failed'));
-
-ALTER TABLE sync_logs 
-  ALTER COLUMN total_extensions SET DEFAULT 0;LL,
+  failed_count INTEGER NOT NULL,
   errors TEXT,
   duration INTEGER,
   triggered_by TEXT NOT NULL DEFAULT 'cron',

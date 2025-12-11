@@ -8,9 +8,10 @@ import { format } from 'date-fns';
 interface StatsChartProps {
   data: ChartDataPoint[];
   className?: string;
+  minValue?: number;
 }
 
-export function StatsChart({ data, className }: StatsChartProps) {
+export function StatsChart({ data, className, minValue }: StatsChartProps) {
   const chartConfig = {
     installs: {
       label: 'Installs',
@@ -38,6 +39,7 @@ export function StatsChart({ data, className }: StatsChartProps) {
           tickLine={false}
           axisLine={false}
           tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+          domain={minValue !== undefined ? [minValue, 'auto'] : ['auto', 'auto']}
         />
         <ChartTooltip content={<ChartTooltipContent />} />
         <Line

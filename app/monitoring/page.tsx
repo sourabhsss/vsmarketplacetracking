@@ -2,10 +2,9 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { formatDistanceToNow, format } from 'date-fns';
-import { ArrowLeft, Activity, CheckCircle2, XCircle, AlertCircle, Clock } from 'lucide-react';
-import Link from 'next/link';
+import { Activity, CheckCircle2, XCircle, AlertCircle, Clock } from 'lucide-react';
+import { AppHeader } from '@/components/app-header';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import {
   Table,
@@ -75,10 +74,10 @@ export default function MonitoringPage() {
 
   const getStatusBadge = (status: string) => {
     const variants = {
-      success: { variant: 'default' as const, icon: CheckCircle2, className: 'bg-green-500/10 text-green-500 border-green-500/20' },
-      partial: { variant: 'secondary' as const, icon: AlertCircle, className: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' },
-      failed: { variant: 'destructive' as const, icon: XCircle, className: 'bg-red-500/10 text-red-500 border-red-500/20' },
-      running: { variant: 'outline' as const, icon: Clock, className: 'bg-blue-500/10 text-blue-500 border-blue-500/20' },
+      success: { variant: 'default' as const, icon: CheckCircle2, className: 'bg-success text-foreground border-foreground' },
+      partial: { variant: 'secondary' as const, icon: AlertCircle, className: 'bg-warning text-foreground border-foreground' },
+      failed: { variant: 'destructive' as const, icon: XCircle, className: 'bg-destructive text-white border-foreground' },
+      running: { variant: 'outline' as const, icon: Clock, className: 'bg-secondary text-foreground border-foreground' },
     };
 
     const config = variants[status as keyof typeof variants] || variants.failed;
@@ -87,7 +86,7 @@ export default function MonitoringPage() {
     return (
       <Badge variant={config.variant} className={config.className}>
         <Icon className="h-3 w-3 mr-1" />
-        {status}
+        {status.toUpperCase()}
       </Badge>
     );
   };
@@ -99,15 +98,16 @@ export default function MonitoringPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background p-8">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <Skeleton className="h-12 w-64" />
-          <div className="grid gap-4 md:grid-cols-4">
+      <div className="min-h-screen bg-background">
+        <AppHeader />
+        <div className="max-w-7xl mx-auto px-8 py-8 space-y-6">
+          <Skeleton className="h-12 w-64 rounded-xl border-3 border-foreground" />
+          <div className="grid gap-6 md:grid-cols-4">
             {[...Array(4)].map((_, i) => (
-              <Skeleton key={i} className="h-32" />
+              <Skeleton key={i} className="h-32 rounded-2xl border-3 border-foreground" />
             ))}
           </div>
-          <Skeleton className="h-96" />
+          <Skeleton className="h-96 rounded-2xl border-3 border-foreground" />
         </div>
       </div>
     );
@@ -117,91 +117,79 @@ export default function MonitoringPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b">
-        <div className="max-w-7xl mx-auto px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/">
-                <Button variant="ghost" size="icon">
-                  <ArrowLeft className="h-5 w-5" />
-                </Button>
-              </Link>
-              <div>
-                <h1 className="text-3xl font-bold flex items-center gap-2">
-                  <Activity className="h-8 w-8" />
-                  Sync Monitoring
-                </h1>
-                <p className="text-muted-foreground mt-1">
-                  Track and monitor all sync operations
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <AppHeader />
 
       <div className="max-w-7xl mx-auto px-8 py-8 space-y-8">
         {/* Summary Cards */}
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Total Syncs (30d)</CardDescription>
-              <CardTitle className="text-3xl">{metrics?.totalSyncs || 0}</CardTitle>
-            </CardHeader>
-          </Card>
+        <div className="grid gap-6 md:grid-cols-4">
+          <div className="bg-primary rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <Activity className="h-8 w-8 text-foreground" />
+            </div>
+            <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
+              Total Syncs (30d)
+            </p>
+            <p className="text-4xl font-black text-foreground">{metrics?.totalSyncs || 0}</p>
+          </div>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Success Rate</CardDescription>
-              <CardTitle className="text-3xl text-green-500">
-                {metrics?.successRate || 0}%
-              </CardTitle>
-            </CardHeader>
-          </Card>
+          <div className="bg-success rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <CheckCircle2 className="h-8 w-8 text-foreground" />
+            </div>
+            <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
+              Success Rate
+            </p>
+            <p className="text-4xl font-black text-foreground">
+              {metrics?.successRate || 0}%
+            </p>
+          </div>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Avg Duration</CardDescription>
-              <CardTitle className="text-3xl">
-                {formatDuration(metrics?.avgDuration || 0)}
-              </CardTitle>
-            </CardHeader>
-          </Card>
+          <div className="bg-secondary rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <Clock className="h-8 w-8 text-foreground" />
+            </div>
+            <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
+              Avg Duration
+            </p>
+            <p className="text-4xl font-black text-foreground">
+              {formatDuration(metrics?.avgDuration || 0)}
+            </p>
+          </div>
 
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Last 24 Hours</CardDescription>
-              <CardTitle className="text-3xl">{last24Hours?.syncs || 0}</CardTitle>
-              <div className="flex gap-2 text-sm mt-2">
-                <span className="text-green-500">{last24Hours?.successful || 0} ✓</span>
-                <span className="text-red-500">{last24Hours?.failed || 0} ✗</span>
-              </div>
-            </CardHeader>
-          </Card>
+          <div className="bg-accent rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-4">
+              <Activity className="h-8 w-8 text-foreground" />
+            </div>
+            <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
+              Last 24 Hours
+            </p>
+            <p className="text-4xl font-black text-foreground">{last24Hours?.syncs || 0}</p>
+            <div className="flex gap-3 text-sm mt-2 font-bold uppercase">
+              <span className="text-foreground">{last24Hours?.successful || 0} ✓</span>
+              <span className="text-foreground">{last24Hours?.failed || 0} ✗</span>
+            </div>
+          </div>
         </div>
 
         {/* Sync Logs Table */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Sync History</CardTitle>
-            <CardDescription>
-              Last 30 days of sync operations
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border">
+        <div className="bg-card rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg">
+          <h2 className="text-xl font-black text-foreground uppercase mb-2">Recent Sync History</h2>
+          <p className="text-sm font-bold text-muted-foreground uppercase mb-6">
+            Last 30 days of sync operations
+          </p>
+          <div>
+            <div className="rounded-xl border-3 border-foreground overflow-hidden">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Timestamp</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Sync Type</TableHead>
-                    <TableHead className="text-right">Extensions</TableHead>
-                    <TableHead className="text-right">Success</TableHead>
-                    <TableHead className="text-right">Failed</TableHead>
-                    <TableHead className="text-right">Duration</TableHead>
-                    <TableHead>Errors</TableHead>
+                  <TableRow className="bg-muted">
+                    <TableHead className="font-black uppercase text-xs">Timestamp</TableHead>
+                    <TableHead className="font-black uppercase text-xs">Status</TableHead>
+                    <TableHead className="font-black uppercase text-xs">Sync Type</TableHead>
+                    <TableHead className="text-right font-black uppercase text-xs">Extensions</TableHead>
+                    <TableHead className="text-right font-black uppercase text-xs">Success</TableHead>
+                    <TableHead className="text-right font-black uppercase text-xs">Failed</TableHead>
+                    <TableHead className="text-right font-black uppercase text-xs">Duration</TableHead>
+                    <TableHead className="font-black uppercase text-xs">Errors</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -223,18 +211,18 @@ export default function MonitoringPage() {
                             variant="outline" 
                             className={
                               log.triggered_by === 'cron' 
-                                ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' 
-                                : 'bg-purple-500/10 text-purple-500 border-purple-500/20'
+                                ? 'bg-secondary text-foreground border-foreground' 
+                                : 'bg-accent text-foreground border-foreground'
                             }
                           >
-                            {log.triggered_by === 'cron' ? '🤖 Auto' : '👤 Manual'}
+                            {log.triggered_by === 'cron' ? '🤖 AUTO' : '👤 MANUAL'}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">{log.total_extensions}</TableCell>
-                        <TableCell className="text-right text-green-500">
+                        <TableCell className="text-right font-bold text-success">
                           {log.success_count}
                         </TableCell>
-                        <TableCell className="text-right text-red-500">
+                        <TableCell className="text-right font-bold text-destructive">
                           {log.failed_count}
                         </TableCell>
                         <TableCell className="text-right font-mono text-sm">
@@ -243,9 +231,9 @@ export default function MonitoringPage() {
                         <TableCell>
                           {log.errors ? (
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
-                              className="h-7 text-xs"
+                              className="h-7 text-xs font-bold uppercase"
                               onClick={() => {
                                 if (!log.errors) return;
                                 try {
@@ -274,22 +262,20 @@ export default function MonitoringPage() {
                 </TableBody>
               </Table>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Additional Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle>About Sync Monitoring</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm text-muted-foreground">
+        <div className="bg-card rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg">
+          <h2 className="text-xl font-black text-foreground uppercase mb-4">About Sync Monitoring</h2>
+          <div className="space-y-2 text-sm font-bold text-muted-foreground uppercase">
             <p>• Automatic syncs run daily at midnight UTC via Vercel Cron</p>
             <p>• Manual syncs can be triggered from the main dashboard</p>
             <p>• Success rate is calculated over the last 30 days</p>
             <p>• Duration measures the time taken to sync all extensions</p>
             <p>• Errors are logged and can be viewed by clicking &quot;View Errors&quot;</p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   );

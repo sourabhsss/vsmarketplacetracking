@@ -7,7 +7,16 @@ CREATE TABLE IF NOT EXISTS sync_logs (
   status TEXT NOT NULL CHECK (status IN ('running', 'success', 'partial', 'failed')),
   total_extensions INTEGER NOT NULL DEFAULT 0,
   success_count INTEGER NOT NULL,
-  failed_count INTEGER NOT NULL,
+  failed_count INTEGER NOT NU-- Allow 'running' status and make total_extensions have a default
+ALTER TABLE sync_logs 
+  DROP CONSTRAINT IF EXISTS sync_logs_status_check;
+
+ALTER TABLE sync_logs 
+  ADD CONSTRAINT sync_logs_status_check 
+  CHECK (status IN ('running', 'success', 'partial', 'failed'));
+
+ALTER TABLE sync_logs 
+  ALTER COLUMN total_extensions SET DEFAULT 0;LL,
   errors TEXT,
   duration INTEGER,
   triggered_by TEXT NOT NULL DEFAULT 'cron',

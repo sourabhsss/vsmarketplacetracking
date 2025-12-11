@@ -3,7 +3,6 @@ import { supabase } from '@/lib/supabase';
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now();
-  let syncLogId: string | null = null;
 
   try {
     // Verify this is called by Vercel Cron (security check)
@@ -27,24 +26,6 @@ export async function GET(request: NextRequest) {
     }
 
     console.log('Starting automatic stats sync...');
-
-    // Create initial sync log entry
-    const { data: syncLog, error: logError } = await supabase
-      .from('sync_logs')
-      .insert([
-        {
-          status: 'running',
-          started_at: new Date().toISOString(),
-        },
-      ])
-      .select()
-      .single();
-
-    if (logError) {
-      console.error('Failed to create sync log:', logError);
-    } else {
-      syncLogId = syncLog.id;
-    }
 
     // Fetch all extensions
     const { data: extensions, error: fetchError } = await supabase
@@ -203,21 +184,24 @@ export async function GET(request: NextRequest) {
 
     const duration = Date.now() - startTime;
     const syncStatus = errorCount === 0 ? 'success' : (successCount > 0 ? 'partial' : 'failed');
+    const totalExtensions = extensions?.length || 0;
 
-    // Update sync log with completion status
-    if (syncLogId) {
-      await supabase
-        .from('sync_logs')
-        .update({
+    // Insert sync log with completion status
+    await supabase
+      .from('sync_logs')
+      .insert([
+        {
           status: syncStatus,
+          total_extensions: totalExtensions,
           success_count: successCount,
           failed_count: errorCount,
           duration,
+          errors: errors.length > 0 ? JSON.stringify(errors) : null,
+          triggered_by: 'cron',
+          started_at: new Date(startTime).toISOString(),
           completed_at: new Date().toISOString(),
-          error_details: errors.length > 0 ? errors : null,
-        })
-        .eq('id', syncLogId);
-    }
+        },
+      ]);
 
     const result = {
       success: true,
@@ -238,20 +222,22 @@ export async function GET(request: NextRequest) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     const duration = Date.now() - startTime;
 
-    // Update sync log with error status
-    if (syncLogId) {
-      await supabase
-        .from('sync_logs')
-        .update({
+    // Insert sync log with error status
+    await supabase
+      .from('sync_logs')
+      .insert([
+        {
           status: 'failed',
+          total_extensions: 0,
           success_count: 0,
           failed_count: 1,
           duration,
+          errors: JSON.stringify([errorMessage]),
+          triggered_by: 'cron',
+          started_at: new Date(startTime).toISOString(),
           completed_at: new Date().toISOString(),
-          error_details: [errorMessage],
-        })
-        .eq('id', syncLogId);
-    }
+        },
+      ]);
 
     const errorResult = {
       success: false,

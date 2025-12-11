@@ -4,8 +4,8 @@
 -- Create sync_logs table
 CREATE TABLE IF NOT EXISTS sync_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  status TEXT NOT NULL CHECK (status IN ('success', 'partial', 'failed')),
-  total_extensions INTEGER NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('running', 'success', 'partial', 'failed')),
+  total_extensions INTEGER NOT NULL DEFAULT 0,
   success_count INTEGER NOT NULL,
   failed_count INTEGER NOT NULL,
   errors TEXT,

@@ -182,8 +182,18 @@
   border-width: 3px;
   border-style: solid;
   border-color: #000000;
-  border-radius: 12px;
+  border-radius: 0px;
   box-shadow: 6px 6px 0px #000000;
+}
+
+@utility brutal-dialog {
+  background-color: #FFFFFF;
+  border-width: 3px;
+  border-style: solid;
+  border-color: #000000;
+  border-radius: 0px;
+  box-shadow: 8px 8px 0px #000000;
+  padding: 32px;
 }
 
 @utility brutal-button {

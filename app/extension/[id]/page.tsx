@@ -159,59 +159,69 @@ export default function ExtensionDetailPage() {
     <div className="min-h-screen bg-background">
       <AppHeader />
       
-      <div className="bg-card border-b-3 border-foreground">
-        <div className="container mx-auto px-4 py-4">
+      <main className="container mx-auto px-4 py-6 md:py-8">
+        {/* Breadcrumb */}
+        <div className="mb-6 md:mb-8">
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={() => router.push('/')}
-            className="mb-4"
+            className="-ml-2"
             size="sm"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Extension List
+            <ArrowLeft className="h-4 w-4 mr-1 md:mr-2" />
+            <span className="text-xs md:text-sm">Back to Extensions</span>
           </Button>
-          <div className="flex items-start justify-between">
-            <div className="flex items-start gap-4">
+        </div>
+
+        {/* Extension Info Card */}
+        <div className="bg-card border-3 border-foreground p-4 md:p-6 brutal-shadow-lg mb-6 md:mb-8">
+          {/* Header with Actions */}
+          <div className="flex items-start justify-between gap-4 mb-4 md:mb-6">
+            <div className="flex items-start gap-3 md:gap-4 flex-1 min-w-0">
               {extension.iconUrl ? (
                 <Image
                   src={extension.iconUrl}
                   alt={extension.displayName}
-                  width={64}
-                  height={64}
-                  className="w-16 h-16 rounded-xl border-3 border-foreground"
+                  width={80}
+                  height={80}
+                  className="w-16 h-16 md:w-20 md:h-20 border-3 border-foreground shrink-0"
                 />
               ) : (
-                <div className="w-16 h-16 rounded-xl bg-primary border-3 border-foreground flex items-center justify-center">
-                  <Package className="h-8 w-8 text-foreground" />
+                <div className="w-16 h-16 md:w-20 md:h-20 bg-primary border-3 border-foreground flex items-center justify-center shrink-0">
+                  <Package className="h-8 w-8 md:h-10 md:w-10 text-foreground" />
                 </div>
               )}
-              <div>
-                <h1 className="text-2xl font-black text-foreground uppercase line-clamp-1" title={extension.displayName}>
-                  {extension.displayName.length > 30 
-                    ? `${extension.displayName.substring(0, 30)}...` 
-                    : extension.displayName}
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-foreground uppercase" title={extension.displayName}>
+                  {extension.displayName}
                 </h1>
-                <p className="text-muted-foreground font-bold mt-1 uppercase text-xs tracking-wider">
+                <p className="text-foreground font-bold mt-2 uppercase text-sm md:text-base tracking-wider">
                   by {extension.publisherName}
                 </p>
-                <div className="flex items-center gap-2 mt-2">
-                  {extension.averageRating && (
-                    <div className="flex items-center gap-1 text-sm">
-                      <Star className="h-4 w-4 fill-warning text-warning" />
-                      <span className="font-bold">{extension.averageRating.toFixed(1)}</span>
-                    </div>
-                  )}
-                </div>
+                {extension.averageRating && (
+                  <div className="flex items-center gap-2 mt-3">
+                    <Star className="h-5 w-5 fill-warning text-warning" />
+                    <span className="text-lg font-bold text-foreground">{extension.averageRating.toFixed(1)}</span>
+                    {extension.ratingCount && (
+                      <span className="text-sm text-foreground font-bold">
+                        ({extension.ratingCount.toLocaleString()} ratings)
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
-            <div className="flex gap-3">
+            
+            {/* Action Buttons */}
+            <div className="flex gap-2 shrink-0">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button 
                     variant="destructive"
+                    size="sm"
                   >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
+                    <Trash2 className="h-4 w-4 md:mr-2" />
+                    <span className="hidden md:inline">Delete</span>
                   </Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
@@ -232,44 +242,42 @@ export default function ExtensionDetailPage() {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-              <Button asChild variant="secondary">
+              <Button asChild variant="secondary" size="sm">
                 <a
                   href={extension.marketplaceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Marketplace
+                  <ExternalLink className="h-4 w-4 md:mr-2" />
+                  <span className="hidden md:inline">Marketplace</span>
                 </a>
               </Button>
             </div>
           </div>
         </div>
-      </div>
 
-      <main className="container mx-auto px-4 py-8">
         {/* Stats Overview Cards */}
-        <div className="grid gap-6 md:grid-cols-4 mb-8">
-          <div className="bg-primary rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <Activity className="h-8 w-8 text-foreground" />
+        <div className="grid gap-4 md:gap-6 grid-cols-2 md:grid-cols-4 mb-8">
+          <div className="bg-primary border-3 border-foreground p-4 md:p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <Activity className="h-6 w-6 md:h-8 md:w-8 text-foreground" />
             </div>
             <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
               Total Installs
             </p>
-            <p className="text-4xl font-black text-foreground">
+            <p className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-black text-foreground break-all">
               <AnimatedStat value={currentInstalls} />
             </p>
           </div>
 
-          <div className="bg-secondary rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <Star className="h-8 w-8 text-foreground fill-warning" />
+          <div className="bg-secondary border-3 border-foreground p-4 md:p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <Star className="h-6 w-6 md:h-8 md:w-8 text-foreground fill-warning" />
             </div>
             <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
               Average Rating
             </p>
-            <p className="text-4xl font-black text-foreground">
+            <p className="text-2xl md:text-3xl lg:text-4xl font-black text-foreground break-all">
               <AnimatedStat value={extension.averageRating || 0} decimals={1} />
             </p>
             {extension.ratingCount && (
@@ -279,14 +287,14 @@ export default function ExtensionDetailPage() {
             )}
           </div>
 
-          <div className="bg-accent rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <TrendingUp className="h-8 w-8 text-foreground" />
+          <div className="bg-accent border-3 border-foreground p-4 md:p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <TrendingUp className="h-6 w-6 md:h-8 md:w-8 text-foreground" />
             </div>
             <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
               Growth ({timeRange})
             </p>
-            <p className="text-4xl font-black text-foreground">
+            <p className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-black text-foreground break-all">
               <AnimatedStat value={growthValue} prefix="+" />
             </p>
             <div className="mt-2">
@@ -294,14 +302,14 @@ export default function ExtensionDetailPage() {
             </div>
           </div>
 
-          <div className="bg-card rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <TrendingUp className="h-8 w-8 text-foreground" />
+          <div className="bg-card border-3 border-foreground p-4 md:p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <TrendingUp className="h-6 w-6 md:h-8 md:w-8 text-foreground" />
             </div>
             <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wider">
               Growth Rate
             </p>
-            <p className="text-4xl font-black text-foreground">
+            <p className="text-2xl md:text-3xl lg:text-4xl font-black text-foreground break-all">
               <AnimatedStat value={growthRate} decimals={1} suffix="%" />
             </p>
           </div>

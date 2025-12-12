@@ -11,9 +11,18 @@ import { ExtensionWithStats } from '@/lib/types';
 import { Activity, Star, TrendingUp, Package } from 'lucide-react';
 import Link from 'next/link';
 import { useFallbackSync } from '@/lib/use-fallback-sync';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useState, useMemo } from 'react';
 
 export default function Home() {
   const queryClient = useQueryClient();
+  const [sortBy, setSortBy] = useState<string>('installs-desc');
   
   // Enable fallback sync if cron fails
   useFallbackSync();
@@ -92,6 +101,26 @@ export default function Home() {
     ? extensions.reduce((sum, ext) => sum + ext.trend, 0) / extensions.length
     : 0;
 
+  // Sort extensions based on selected option
+  const sortedExtensions = useMemo(() => {
+    if (!extensions) return [];
+    
+    const sorted = [...extensions];
+    
+    switch(sortBy) {
+      case 'installs-desc':
+        return sorted.sort((a, b) => b.currentInstalls - a.currentInstalls);
+      case 'installs-asc':
+        return sorted.sort((a, b) => a.currentInstalls - b.currentInstalls);
+      case 'name-asc':
+        return sorted.sort((a, b) => a.displayName.localeCompare(b.displayName));
+      case 'name-desc':
+        return sorted.sort((a, b) => b.displayName.localeCompare(a.displayName));
+      default:
+        return sorted;
+    }
+  }, [extensions, sortBy]);
+
   return (
     <div className="min-h-screen bg-background">
       <AppHeader />
@@ -100,51 +129,51 @@ export default function Home() {
         <div className="mb-6 flex justify-end">
           <AddExtensionDialog onAdd={(id) => addMutation.mutateAsync(id)} />
         </div>
-        <div className="mb-8 grid gap-6 md:grid-cols-4">
-          <div className="bg-card rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <Package className="h-8 w-8 text-foreground" />
+        <div className="mb-8 grid gap-4 md:gap-6 grid-cols-2 md:grid-cols-4">
+          <div className="bg-card border-3 border-foreground p-4 md:p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <Package className="h-6 w-6 md:h-8 md:w-8 text-foreground" />
             </div>
             <p className="text-xs font-bold text-muted-foreground mb-2 uppercase tracking-wider">
               Total Extensions
             </p>
-            <p className="text-4xl font-black text-foreground">
+            <p className="text-2xl md:text-3xl lg:text-4xl font-black text-foreground break-all">
               <AnimatedStat value={extensions?.length || 0} />
             </p>
           </div>
 
-          <div className="bg-primary rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <Activity className="h-8 w-8 text-foreground" />
+          <div className="bg-primary border-3 border-foreground p-4 md:p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <Activity className="h-6 w-6 md:h-8 md:w-8 text-foreground" />
             </div>
             <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
               Total Installs
             </p>
-            <p className="text-4xl font-black text-foreground">
+            <p className="text-xl md:text-2xl lg:text-3xl xl:text-4xl font-black text-foreground break-all">
               <AnimatedStat value={totalInstalls} />
             </p>
           </div>
 
-          <div className="bg-secondary rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <Star className="h-8 w-8 text-foreground" />
+          <div className="bg-secondary border-3 border-foreground p-4 md:p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <Star className="h-6 w-6 md:h-8 md:w-8 text-foreground" />
             </div>
             <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
               Average Rating
             </p>
-            <p className="text-4xl font-black text-foreground">
+            <p className="text-2xl md:text-3xl lg:text-4xl font-black text-foreground break-all">
               <AnimatedStat value={averageRating} decimals={1} />
             </p>
           </div>
 
-          <div className="bg-accent rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <TrendingUp className="h-8 w-8 text-foreground" />
+          <div className="bg-accent border-3 border-foreground p-4 md:p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <TrendingUp className="h-6 w-6 md:h-8 md:w-8 text-foreground" />
             </div>
             <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
               Average Growth
             </p>
-            <p className="text-4xl font-black text-foreground">
+            <p className="text-2xl md:text-3xl lg:text-4xl font-black text-foreground break-all">
               <AnimatedStat value={averageGrowth} decimals={1} suffix="%" />
             </p>
           </div>
@@ -166,6 +195,26 @@ export default function Home() {
               <Link href="/compare">Compare</Link>
             </Button>
           </div>
+          
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-[240px] bg-card border-3 border-foreground font-bold uppercase text-xs h-9">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent className="bg-card border-3 border-foreground shadow-[6px_6px_0px_#000000]">
+              <SelectItem value="installs-desc" className="font-bold uppercase text-xs">
+                Installs (High to Low)
+              </SelectItem>
+              <SelectItem value="installs-asc" className="font-bold uppercase text-xs">
+                Installs (Low to High)
+              </SelectItem>
+              <SelectItem value="name-asc" className="font-bold uppercase text-xs">
+                Name (A-Z)
+              </SelectItem>
+              <SelectItem value="name-desc" className="font-bold uppercase text-xs">
+                Name (Z-A)
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         {isLoading ? (
@@ -174,9 +223,9 @@ export default function Home() {
               <Skeleton key={i} className="h-64 rounded-xl border-3 border-foreground" />
             ))}
           </div>
-        ) : extensions && extensions.length > 0 ? (
+        ) : sortedExtensions && sortedExtensions.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {extensions.map((extension) => (
+            {sortedExtensions.map((extension) => (
               <ExtensionCard
                 key={extension.id}
                 extension={extension}

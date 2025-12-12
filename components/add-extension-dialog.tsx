@@ -43,7 +43,7 @@ export function AddExtensionDialog({ onAdd }: AddExtensionDialogProps) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+        <Button variant="default">
           <Plus className="h-4 w-4 mr-2" />
           Add Extension
         </Button>
@@ -66,17 +66,16 @@ export function AddExtensionDialog({ onAdd }: AddExtensionDialogProps) {
           <div className="flex justify-end gap-2">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               onClick={() => setOpen(false)}
               disabled={loading}
-              className="border-border/50"
             >
               Cancel
             </Button>
             <Button 
               type="submit" 
+              variant="default"
               disabled={loading || !extensionId.trim()}
-              className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
             >
               {loading ? 'Adding...' : 'Add Extension'}
             </Button>

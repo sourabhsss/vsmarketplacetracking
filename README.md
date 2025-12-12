@@ -1,15 +1,15 @@
 # VS Code Extension Tracker
 
-A modern, real-time analytics dashboard for tracking VS Code extension statistics with beautiful 3D card effects and comprehensive monitoring.
+A modern, real-time analytics dashboard for tracking VS Code extension statistics with beautiful neubrutalism design.
 
 ## Features
 
-- 🎨 **Beautiful UI** - Comet Card 3D tilt effects from Aceternity UI
+- 🎨 **Beautiful UI** - Neubrutalism design with bold colors and shadows
 - 📊 **Real-time Analytics** - Track installs, ratings, and growth trends
-- 🔄 **Automated Sync** - Daily cron jobs with retry logic and fallback mechanisms
+- 🔄 **Automated Sync** - Daily cron jobs with monitoring
 - 📈 **Data Visualization** - Interactive charts powered by Recharts
 - 🔔 **Smart Monitoring** - Sync health dashboard with gap detection
-- ⚡ **Performance** - Built with Next.js 15, Tailwind v4, and optimized images
+- ⚡ **Performance** - Built with Next.js 15 and Tailwind v4
 
 ## Tech Stack
 
@@ -26,28 +26,23 @@ A modern, real-time analytics dashboard for tracking VS Code extension statistic
 
 ## Quick Start
 
-### 1. Clone the repository
+### 1. Clone and Install
 
 ```bash
-git clone https://github.com/sourabhsss/vsmarketplacetracking.git
+git clone <your-repo-url>
 cd vsmarketplacetracking
-```
-
-### 2. Install dependencies
-
-```bash
 pnpm install
 ```
 
-### 3. Set up Supabase
+### 2. Set up Supabase
 
 1. Create a new project at [supabase.com](https://supabase.com)
-2. Run the SQL setup scripts in order:
+2. Run the SQL setup scripts in the Supabase SQL Editor:
    - `SUPABASE_SQL_SETUP.sql` - Creates base tables
    - `SUPABASE_ADD_RATING_COLUMNS.sql` - Adds rating columns
    - `SUPABASE_SYNC_MONITORING_SETUP.sql` - Adds monitoring tables
 
-### 4. Configure environment variables
+### 3. Configure Environment Variables
 
 Create a `.env.local` file:
 
@@ -56,75 +51,55 @@ Create a `.env.local` file:
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
-# Cron Secret (generate a random string)
+# Cron Secret (generate a secure random string)
 CRON_SECRET=your-random-secret-key
-
-# Optional: Webhook for sync alerts
-SYNC_ALERT_WEBHOOK_URL=your-webhook-url
 ```
 
-### 5. Run the development server
+**Security Note**: Never commit `.env.local` to version control. Use a strong random string for `CRON_SECRET`.
+
+### 4. Run Development Server
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the app.
+Open [http://localhost:3000](http://localhost:3000)
 
 ## Deployment on Vercel
 
 ### 1. Push to GitHub
 
 ```bash
+git add .
+git commit -m "Initial commit"
 git push origin main
 ```
 
-### 2. Import to Vercel
+### 2. Deploy to Vercel
 
-1. Go to [vercel.com](https://vercel.com)
-2. Import your GitHub repository
-3. Configure environment variables in Vercel dashboard:
+1. Go to [vercel.com](https://vercel.com) and import your repository
+2. Add environment variables:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `CRON_SECRET`
-   - `SYNC_ALERT_WEBHOOK_URL` (optional)
 
-### 3. Deploy
+3. Deploy - Vercel will automatically deploy on every push
 
-Vercel will automatically deploy on every push to main.
+### 3. Verify Cron Job
 
-## Documentation
-
-- [Setup Guide](./SETUP.md) - Detailed setup instructions
-- [Simple Setup](./SIMPLE_SETUP.md) - Quick start guide
-- [Automatic Sync Setup](./AUTOMATIC_SYNC_SETUP.md) - Cron job configuration
-- [Sync Monitoring Guide](./SYNC_MONITORING_GUIDE.md) - Monitoring and alerts
-- [Supabase Setup](./SUPABASE_SETUP_GUIDE.md) - Database configuration
-
-## Key Features Explained
-
-### Comet Card 3D Effects
-Extension cards feature mouse-tracked 3D tilt effects for an engaging user experience.
-
-### Sync Health Monitoring
-- Real-time sync status indicator
-- Data gap detection
-- Webhook alerts for failures
-- Fallback sync on user visit
-
-### Automated Daily Sync
-- Runs at 00:00 UTC daily via Vercel Cron
-- Retry logic with exponential backoff
-- Duplicate detection
-- Rate limiting protection
+The cron job runs daily at 00:00 UTC. Check `/monitoring` page for sync status.
 
 ## Project Structure
 
 ```
 ├── app/
 │   ├── api/              # API routes
+│   │   ├── cron/         # Cron job endpoints
+│   │   ├── extensions/   # Extension CRUD
+│   │   └── stats/        # Statistics endpoints
 │   ├── extension/[id]/   # Extension detail page
 │   ├── compare/          # Comparison page
+│   ├── monitoring/       # Sync monitoring page
 │   └── page.tsx          # Dashboard
 ├── components/
 │   ├── ui/               # shadcn components
@@ -132,10 +107,53 @@ Extension cards feature mouse-tracked 3D tilt effects for an engaging user exper
 ├── lib/
 │   ├── supabase.ts       # Supabase client
 │   ├── sync-utils.ts     # Sync utilities
+│   ├── store.ts          # Zustand store
 │   └── types.ts          # TypeScript types
-└── prisma/
-    └── schema.prisma     # Database schema
+└── public/               # Static assets
 ```
+
+## Key Features
+
+### Automated Daily Sync
+- Runs at 00:00 UTC via Vercel Cron
+- Fetches latest stats from VS Code Marketplace
+- Prevents duplicate entries
+- Includes retry logic and error handling
+
+### Sync Health Monitoring
+- Real-time sync status indicator
+- Data gap detection
+- Manual sync trigger
+- Detailed sync logs
+
+### Extension Management
+- Add/remove extensions
+- Track install counts, ratings, and downloads
+- Compare multiple extensions
+- View historical trends
+
+## Security Checklist
+
+✅ Environment variables properly configured
+✅ No hardcoded secrets in code
+✅ Cron endpoints protected with authorization
+✅ `.env.local` in `.gitignore`
+✅ Supabase RLS policies recommended (configure in Supabase dashboard)
+
+## Database Setup Files
+
+- `SUPABASE_SQL_SETUP.sql` - Initial database schema
+- `SUPABASE_ADD_RATING_COLUMNS.sql` - Rating columns migration
+- `SUPABASE_SYNC_MONITORING_SETUP.sql` - Monitoring tables
+
+## API Endpoints
+
+- `GET /api/extensions` - List all extensions
+- `POST /api/extensions` - Add new extension
+- `DELETE /api/extensions/[id]` - Remove extension
+- `GET /api/stats/[id]` - Get extension statistics
+- `GET /api/cron/sync-stats` - Sync job (protected)
+- `GET /api/sync-health` - Check sync status
 
 ## Contributing
 
@@ -143,7 +161,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT License - feel free to use this project for your own purposes.
+MIT License
 
 ## Support
 

@@ -121,49 +121,49 @@ export default function MonitoringPage() {
 
       <div className="max-w-7xl mx-auto px-8 py-8 space-y-8">
         {/* Summary Cards */}
-        <div className="grid gap-6 md:grid-cols-4">
-          <div className="bg-primary rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <Activity className="h-8 w-8 text-foreground" />
+        <div className="grid gap-4 md:gap-6 grid-cols-2 md:grid-cols-4">
+          <div className="bg-primary border-3 border-foreground p-4 md:p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <Activity className="h-6 w-6 md:h-8 md:w-8 text-foreground" />
             </div>
             <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
               Total Syncs (30d)
             </p>
-            <p className="text-4xl font-black text-foreground">{metrics?.totalSyncs || 0}</p>
+            <p className="text-2xl md:text-3xl lg:text-4xl font-black text-foreground break-all">{metrics?.totalSyncs || 0}</p>
           </div>
 
-          <div className="bg-success rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <CheckCircle2 className="h-8 w-8 text-foreground" />
+          <div className="bg-success border-3 border-foreground p-4 md:p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <CheckCircle2 className="h-6 w-6 md:h-8 md:w-8 text-foreground" />
             </div>
             <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
               Success Rate
             </p>
-            <p className="text-4xl font-black text-foreground">
+            <p className="text-2xl md:text-3xl lg:text-4xl font-black text-foreground break-all">
               {metrics?.successRate || 0}%
             </p>
           </div>
 
-          <div className="bg-secondary rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <Clock className="h-8 w-8 text-foreground" />
+          <div className="bg-secondary border-3 border-foreground p-4 md:p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <Clock className="h-6 w-6 md:h-8 md:w-8 text-foreground" />
             </div>
             <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
               Avg Duration
             </p>
-            <p className="text-4xl font-black text-foreground">
+            <p className="text-xl md:text-2xl lg:text-3xl font-black text-foreground break-all">
               {formatDuration(metrics?.avgDuration || 0)}
             </p>
           </div>
 
-          <div className="bg-accent rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
-            <div className="flex items-center justify-between mb-4">
-              <Activity className="h-8 w-8 text-foreground" />
+          <div className="bg-accent border-3 border-foreground p-4 md:p-6 brutal-shadow-lg hover:translate-x-1 hover:translate-y-1 hover:shadow-[4px_4px_0px_#000000] transition-all">
+            <div className="flex items-center justify-between mb-3 md:mb-4">
+              <Activity className="h-6 w-6 md:h-8 md:w-8 text-foreground" />
             </div>
             <p className="text-xs font-bold text-foreground mb-2 uppercase tracking-wider">
               Last 24 Hours
             </p>
-            <p className="text-4xl font-black text-foreground">{last24Hours?.syncs || 0}</p>
+            <p className="text-2xl md:text-3xl lg:text-4xl font-black text-foreground break-all">{last24Hours?.syncs || 0}</p>
             <div className="flex gap-3 text-sm mt-2 font-bold uppercase">
               <span className="text-foreground">{last24Hours?.successful || 0} ✓</span>
               <span className="text-foreground">{last24Hours?.failed || 0} ✗</span>
@@ -172,7 +172,7 @@ export default function MonitoringPage() {
         </div>
 
         {/* Sync Logs Table */}
-        <div className="bg-card rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg">
+        <div className="bg-card border-3 border-foreground p-4 md:p-6 brutal-shadow-lg">
           <h2 className="text-xl font-black text-foreground uppercase mb-2">Recent Sync History</h2>
           <p className="text-sm font-bold text-muted-foreground uppercase mb-6">
             Last 30 days of sync operations
@@ -266,7 +266,7 @@ export default function MonitoringPage() {
         </div>
 
         {/* Additional Info */}
-        <div className="bg-card rounded-2xl border-3 border-foreground p-6 brutal-shadow-lg">
+        <div className="bg-card border-3 border-foreground p-4 md:p-6 brutal-shadow-lg">
           <h2 className="text-xl font-black text-foreground uppercase mb-4">About Sync Monitoring</h2>
           <div className="space-y-2 text-sm font-bold text-muted-foreground uppercase">
             <p>• Automatic syncs run daily at midnight UTC via Vercel Cron</p>

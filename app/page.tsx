@@ -74,19 +74,6 @@ export default function Home() {
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: async (id: string) => {
-      const res = await fetch(`/api/extensions/${id}`, {
-        method: 'DELETE',
-      });
-      if (!res.ok) throw new Error('Failed to delete extension');
-      return res.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['extensions'] });
-    },
-  });
-
 
   const totalInstalls = extensions?.reduce(
     (sum, ext) => sum + ext.currentInstalls,
@@ -229,7 +216,6 @@ export default function Home() {
               <ExtensionCard
                 key={extension.id}
                 extension={extension}
-                onDelete={(id) => deleteMutation.mutate(id)}
               />
             ))}
           </div>

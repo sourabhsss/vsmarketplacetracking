@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ExternalLink, Trash2, Package, Star } from 'lucide-react';
+import { ExternalLink, Package, Star } from 'lucide-react';
 import { ExtensionWithStats } from '@/lib/types';
 import { TrendIndicator } from '@/components/trend-indicator';
 import { AnimatedStat } from '@/components/animated-stat';
@@ -11,10 +11,9 @@ import Image from 'next/image';
 
 interface ExtensionCardProps {
   extension: ExtensionWithStats;
-  onDelete: (id: string) => void;
 }
 
-export function ExtensionCard({ extension, onDelete }: ExtensionCardProps) {
+export function ExtensionCard({ extension }: ExtensionCardProps) {
   const trend = extension.trend || 0;
   
   // Safety check for undefined values
@@ -54,17 +53,6 @@ export function ExtensionCard({ extension, onDelete }: ExtensionCardProps) {
             </p>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          onClick={(e) => {
-            e.preventDefault();
-            onDelete(extension.id);
-          }}
-          className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity border-0 shadow-none"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 gap-4 mb-4">

@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AnimatedStat } from '@/components/animated-stat';
 import { TrendIndicator } from '@/components/trend-indicator';
-import { ArrowLeft, ExternalLink, Trash2, Activity, TrendingUp, Star, Package } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Trash2, Activity, TrendingUp, Star, Package, AlertTriangle } from 'lucide-react';
 import { useState } from 'react';
 import { TimeRange } from '@/lib/types';
 import { toast } from 'sonner';
@@ -192,10 +192,10 @@ export default function ExtensionDetailPage() {
                 </div>
               )}
               <div className="min-w-0 flex-1">
-                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-foreground uppercase" title={extension.displayName}>
+                <h1 className="text-lg sm:text-xl md:text-2xl font-black text-foreground uppercase truncate" title={extension.displayName}>
                   {extension.displayName}
                 </h1>
-                <p className="text-foreground font-bold mt-2 uppercase text-sm md:text-base tracking-wider">
+                <p className="text-foreground font-bold mt-2 uppercase text-sm md:text-base tracking-wider truncate" title={`by ${extension.publisherName}`}>
                   by {extension.publisherName}
                 </p>
                 {extension.averageRating && (
@@ -224,18 +224,28 @@ export default function ExtensionDetailPage() {
                     <span className="hidden md:inline">Delete</span>
                   </Button>
                 </AlertDialogTrigger>
-                <AlertDialogContent>
+                <AlertDialogContent className="bg-card max-w-[90vw] sm:max-w-lg">
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Extension</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to delete &quot;{extension.displayName}&quot;? This will remove all historical data and cannot be undone.
+                    <AlertDialogTitle className="flex items-center gap-2 text-base sm:text-lg">
+                      <AlertTriangle className="h-4 w-4 sm:h-5 sm:w-5 text-destructive shrink-0" />
+                      Delete Extension?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription asChild>
+                      <div className="space-y-2 text-xs sm:text-sm">
+                        <div className="font-bold text-foreground">
+                          Are you sure you want to delete &quot;{extension.displayName.length > 25 ? extension.displayName.substring(0, 25) + '...' : extension.displayName}&quot;?
+                        </div>
+                        <div className="text-muted-foreground">
+                          This will remove all historical data and cannot be undone.
+                        </div>
+                      </div>
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                       onClick={() => deleteMutation.mutate(extension.id)}
-                      className="bg-destructive hover:bg-destructive text-white"
+                      className="bg-destructive/10 hover:bg-destructive/20 text-destructive border-destructive"
                     >
                       Delete
                     </AlertDialogAction>
